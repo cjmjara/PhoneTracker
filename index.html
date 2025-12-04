@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0a0a0f">
+    <meta name="description" content="Track your missing phone location on an interactive map">
+    <title>Phone Tracker - Find My Device</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📱</text></svg>">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Animated background -->
+        <div class="bg-grid"></div>
+        <div class="bg-glow glow-1"></div>
+        <div class="bg-glow glow-2"></div>
+        
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+                        <circle cx="12" cy="9" r="2.5"/>
+                    </svg>
+                </div>
+                <span class="logo-text">PhoneTracker</span>
+            </div>
+            <div class="status-badge">
+                <span class="pulse"></span>
+                <span>Live Tracking</span>
+            </div>
+        </header>
+
+        <!-- Main content -->
+        <main class="main-content">
+            <!-- Control Panel -->
+            <aside class="control-panel">
+                <div class="panel-section">
+                    <h2 class="section-title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="5" y="2" width="14" height="20" rx="2"/>
+                            <line x1="12" y1="18" x2="12" y2="18"/>
+                        </svg>
+                        Your Location
+                    </h2>
+                    <div class="input-group">
+                        <label for="my-lat">Latitude</label>
+                        <input type="number" id="my-lat" step="any" placeholder="e.g., 37.7749">
+                    </div>
+                    <div class="input-group">
+                        <label for="my-lng">Longitude</label>
+                        <input type="number" id="my-lng" step="any" placeholder="e.g., -122.4194">
+                    </div>
+                    <button class="btn btn-secondary" id="use-my-location">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M12 2v4m0 12v4M2 12h4m12 0h4"/>
+                        </svg>
+                        Use Current Location
+                    </button>
+                </div>
+
+                <div class="panel-section">
+                    <h2 class="section-title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 6v6l4 2"/>
+                        </svg>
+                        Missing Phone
+                    </h2>
+                    <div class="input-group">
+                        <label for="missing-lat">Latitude</label>
+                        <input type="number" id="missing-lat" step="any" placeholder="From Find My Device">
+                    </div>
+                    <div class="input-group">
+                        <label for="missing-lng">Longitude</label>
+                        <input type="number" id="missing-lng" step="any" placeholder="From Find My Device">
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" id="track-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+                        <circle cx="12" cy="9" r="2.5"/>
+                    </svg>
+                    Track Devices
+                </button>
+
+                <!-- Distance Info -->
+                <div class="info-card" id="distance-card" style="display: none;">
+                    <div class="info-header">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 6L6 18M6 6l12 12"/>
+                        </svg>
+                        Distance Between Devices
+                    </div>
+                    <div class="distance-value" id="distance-value">--</div>
+                    <div class="distance-note">Approximate straight-line distance</div>
+                </div>
+
+                <!-- Quick Tips -->
+                <div class="tips-card">
+                    <h3>💡 How to get coordinates</h3>
+                    <ol>
+                        <li>Go to <a href="https://www.google.com/android/find" target="_blank">Google Find My Device</a></li>
+                        <li>Sign in with your Google account</li>
+                        <li>Click on your missing device</li>
+                        <li>Right-click on the map location → "What's here?"</li>
+                        <li>Copy the coordinates shown</li>
+                    </ol>
+                </div>
+            </aside>
+
+            <!-- Map Container -->
+            <div class="map-wrapper">
+                <div id="map"></div>
+                <div class="map-legend">
+                    <div class="legend-item">
+                        <span class="legend-marker you"></span>
+                        <span>Your Location</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-marker missing"></span>
+                        <span>Missing Phone</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Mobile Toggle Button -->
+    <button class="mobile-toggle" id="mobile-toggle" aria-label="Toggle controls">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 5v14M5 12h14"/>
+        </svg>
+    </button>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
+
