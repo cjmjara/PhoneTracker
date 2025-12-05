@@ -27,6 +27,36 @@ const useMyLocationBtn = document.getElementById('use-my-location');
 const distanceCard = document.getElementById('distance-card');
 const distanceValue = document.getElementById('distance-value');
 
+// Load saved coordinates from localStorage
+function loadSavedCoordinates() {
+    const saved = localStorage.getItem('phoneTrackerCoords');
+    if (saved) {
+        try {
+            const coords = JSON.parse(saved);
+            if (coords.myLat) myLatInput.value = coords.myLat;
+            if (coords.myLng) myLngInput.value = coords.myLng;
+            if (coords.missingLat) missingLatInput.value = coords.missingLat;
+            if (coords.missingLng) missingLngInput.value = coords.missingLng;
+        } catch (e) {
+            console.log('Could not load saved coordinates');
+        }
+    }
+}
+
+// Save coordinates to localStorage
+function saveCoordinates() {
+    const coords = {
+        myLat: myLatInput.value,
+        myLng: myLngInput.value,
+        missingLat: missingLatInput.value,
+        missingLng: missingLngInput.value
+    };
+    localStorage.setItem('phoneTrackerCoords', JSON.stringify(coords));
+}
+
+// Load saved coordinates on page load
+loadSavedCoordinates();
+
 // Create custom marker icons
 function createCustomIcon(type) {
     const iconHtml = `
@@ -218,8 +248,16 @@ function getCurrentLocation() {
 }
 
 // Event Listeners
-trackBtn.addEventListener('click', updateMap);
+trackBtn.addEventListener('click', () => {
+    saveCoordinates(); // Save before tracking
+    updateMap();
+});
 useMyLocationBtn.addEventListener('click', getCurrentLocation);
+
+// Auto-save when inputs change
+[myLatInput, myLngInput, missingLatInput, missingLngInput].forEach(input => {
+    input.addEventListener('change', saveCoordinates);
+});
 
 // Allow Enter key to trigger tracking
 [myLatInput, myLngInput, missingLatInput, missingLngInput].forEach(input => {
