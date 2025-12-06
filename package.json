@@ -1,0 +1,25 @@
+{
+  "name": "tracker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cjmjara/PhoneTracker.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cjmjara/PhoneTracker/issues"
+  },
+  "homepage": "https://github.com/cjmjara/PhoneTracker#readme",
+  "dependencies": {
+    "@capacitor/android": "^7.4.4",
+    "@capacitor/cli": "^7.4.4",
+    "@capacitor/core": "^7.4.4"
+  }
+}
